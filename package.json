@@ -8,7 +8,9 @@
     "autoprefixer": "postcss style.css -u autoprefixer -d ./",
     "cleancss": "cleancss -o ./style.min.css style.css",
     "build:css": "npm run stylus && npm run autoprefixer && npm run cleancss",
-    "build:ts": "tsc --out app.js src/app.ts"
+    "build:ts": "tsc --out app.js src/app.ts",
+    "uglifyjs": "uglifyjs app.js -m -c -o app.min.js",
+    "build:js": "npm run build:ts && npm run uglifyjs"
   },
   "repository": {
     "type": "git",
