@@ -1,11 +1,7 @@
 'use strict';
 var found = function (list, item) { return list.indexOf(item) > -1; };
-var isoToDate = function (str) {
-    return new Date(str).toLocaleDateString().replace(/\//g, '/');
-};
-var toShortDate = function (str) {
-    return "(" + (new Date(str).getMonth() + 1) + "/" + new Date(str).getFullYear() + ")";
-};
+var isoToDate = function (str) { return new Date(str).toLocaleDateString().replace(/\//g, '/'); };
+var toShortDate = function (str) { return "(" + (new Date(str).getMonth() + 1) + "/" + new Date(str).getFullYear() + ")"; };
 var id = function (name) { return document.getElementById(name); };
 var tags = function (el, name) { return el.getElementsByTagName(name); };
 var createElement = function (name) { return document.createElement(name); };
@@ -28,30 +24,33 @@ var E = function (str, attrs, txt) {
     attrs && setElementAttributes(el, attrs);
     txt && setElementText(el, txt);
     return el;
-}, createFragment = function () { return document.createDocumentFragment(); }, replaceNode = function (oldEl, newEl) {
-    return oldEl.parentNode.replaceChild(newEl, oldEl);
-}, prependElement = function (parentEl, childEl) {
-    return parentEl.insertBefore(childEl, parentEl.firstChild);
-}, appendElement = function (parentEl, childEl) { return parentEl.appendChild(childEl); }, render = function (data, fn) {
-    return document.createRange().createContextualFragment(fn(data)).firstChild;
-}, setBGUrl = function (url, size) {
+};
+var createFragment = function () { return document.createDocumentFragment(); };
+var replaceNode = function (oldEl, newEl) { return oldEl.parentNode.replaceChild(newEl, oldEl); };
+var prependElement = function (parentEl, childEl) { return parentEl.insertBefore(childEl, parentEl.firstChild); };
+var appendElement = function (parentEl, childEl) { return parentEl.appendChild(childEl); };
+var render = function (data, fn) { return document.createRange().createContextualFragment(fn(data)).firstChild; };
+var setBGUrl = function (url, size) {
     if (size === void 0) { size = 'contain'; }
     return "\n\tbackground: url(" + url + ") no-repeat;\n\tbackground-size: " + size + " !important\n";
-}, getProp = function (computedStyle, prop) {
-    return String(computedStyle.getPropertyValue(prop)).trim();
-}, setProp = function (el, prop, val) { return el.style.setProperty(prop, val); }, setProps = function (el, obj) {
+};
+var getProp = function (computedStyle, prop) { return String(computedStyle.getPropertyValue(prop)).trim(); };
+var setProp = function (el, prop, val) { return el.style.setProperty(prop, val); };
+var setProps = function (el, obj) {
     for (var prop in obj) {
         var val = obj[prop];
         el.style.setProperty(prop, val);
     }
     return el;
-}, isInView = function (el, visible) {
+};
+var isInView = function (el, visible) {
     if (visible === void 0) { visible = ''; }
     var _a = el.getBoundingClientRect(), top = _a.top, bottom = _a.bottom, height = window.innerHeight;
     return visible === 'partial' ?
         top < height && (bottom >= 0) :
         top >= 0 && (bottom <= height);
-}, paint = function () {
+};
+var paint = function () {
     var elems = tags(document, 'course');
     var _loop_1 = function (el) {
         var check = setInterval(function () {
@@ -78,7 +77,8 @@ var E = function (str, attrs, txt) {
         var el = elems_1[_i];
         _loop_1(el);
     }
-}, conceive = function (data) {
+};
+var conceive = function (data) {
     var _a, _b;
     var courses = [], badges = [];
     var badgeCollection = data.badges;
@@ -133,19 +133,22 @@ var E = function (str, attrs, txt) {
     replaceNode(welcome, fragment);
     // animate
     paint();
-}, 
-// https://davidwalsh.name/promises
-request = function (url, fn) {
+};
+var request = function (url, fn) {
     var num = 100; // percent difference
-    var loader = id('loader'), computedStyle = getComputedStyle(loader), req = new XMLHttpRequest(), progress = function () {
+    var loader = id('loader');
+    var computedStyle = getComputedStyle(loader);
+    var req = new XMLHttpRequest();
+    var progress = function () {
         var _a;
         var computedValue = getProp(computedStyle, '--progress');
-        num *= computedValue < '50' ? .9 : .6;
+        num *= +computedValue < 50 ? .9 : .6;
         setProps(loader, (_a = {},
             _a['--progress'] = num,
             _a['--percent'] = "'" + (100 - num.toFixed(0)) + "'",
             _a));
-    }, loading = setInterval(progress, 300);
+    };
+    var loading = setInterval(progress, 300);
     req.open("GET", url, true);
     req.onload = function () {
         var _a;
@@ -162,5 +165,4 @@ request = function (url, fn) {
     };
     req.send();
 };
-// end const
 request('https://teamtreehouse.com/abrahamjuliot.json', conceive);

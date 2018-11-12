@@ -1,42 +1,34 @@
 'use strict' 
-// using recursion, functional loops, vanilla js, 
-// css variables, grid, es6, custom animations
-// html fragments, custom elements, no libraries
-// https://jsoneditoronline.org/?id=f02c02b91b8a65ff803d2b5552a08edd
-// http://www.typescriptlang.org/docs/handbook/interfaces.html
-// https://www.typescriptlang.org/docs/handbook/functions.html
-
-/*
-
-https://davidwalsh.name/convert-html-stings-dom-nodes
-*/
 
 interface ItemFinder { (list: Array<any>, item: any): boolean }
 interface StringModifier { (str: string): string }
 interface ElementGetter { (name: string): Element }
 interface NodeListGetter {
-	(el: Document|HTMLElement, name: string): NodeListOf<Element>
+	(el: Document|HTMLElement|Element, name: string): NodeListOf<Element>
 }
-
+interface HTMLCollectionGetter {
+	(el: Document|HTMLElement|Element, name: string): HTMLCollectionOf<Element>| any
+}
+interface ElementSetter {
+	(el: HTMLElement|Element, name: string): void
+}
+interface ElementModifier {
+	(el: HTMLElement, name: any): HTMLElement
+}
 interface ElementCreator { (name: string): HTMLElement}
 
-
 const found: ItemFinder = (list, item) => list.indexOf(item) > -1
-const isoToDate: StringModifier = str => {
-	return new Date(str).toLocaleDateString().replace(/\//g,'/')
-}
-const toShortDate: StringModifier = str => {
-	return `(${new Date(str).getMonth()+1}/${new Date(str).getFullYear()})`	
-}
+const isoToDate: StringModifier = str => new Date(str).toLocaleDateString().replace(/\//g,'/')
+const toShortDate: StringModifier = str => `(${new Date(str).getMonth()+1}/${new Date(str).getFullYear()})`
 const id: ElementGetter = name => document.getElementById(name)
-const tags = (el, name) => el.getElementsByTagName(name)
+const tags: HTMLCollectionGetter = (el, name) => el.getElementsByTagName(name)
 const createElement: ElementCreator = (name) => document.createElement(name)
-const addClass = (el, name) => el.classList.add(name)
-const setElementText = (el, name) => {
+const addClass: ElementSetter = (el, name) => el.classList.add(name)
+const setElementText: ElementModifier = (el, name) => {
 	el.textContent = name
 	return el
 }
-const setElementAttributes = (el, name: any) => {
+const setElementAttributes: ElementModifier = (el, name: any) => {
 	for (const prop in name) {
 		const val = name[prop]
 		el.setAttribute(prop, val)
@@ -44,39 +36,32 @@ const setElementAttributes = (el, name: any) => {
 	return el
 }
 
-const 
-E = (str: string, attrs = undefined, txt: string = undefined): HTMLElement => {
+const E = (str: string, attrs = undefined, txt: string = undefined): HTMLElement => {
 	const el = createElement(str)
 	attrs && setElementAttributes(el, attrs)
 	txt && setElementText(el, txt)
 	return el
-},
-createFragment = () => document.createDocumentFragment(),
-replaceNode = (oldEl, newEl) => 
-	oldEl.parentNode.replaceChild(newEl, oldEl),
-prependElement = (parentEl, childEl) =>
-	parentEl.insertBefore(childEl, parentEl.firstChild),
-appendElement = (parentEl, childEl) => parentEl.appendChild(childEl),
-render = (data, fn) => {
-	return document.createRange().createContextualFragment(fn(data)).firstChild
-},
-
-setBGUrl = (url, size = 'contain') => `
+}
+const createFragment = (): DocumentFragment => document.createDocumentFragment()
+const replaceNode = (oldEl, newEl) => oldEl.parentNode.replaceChild(newEl, oldEl)
+const prependElement = (parentEl, childEl) => parentEl.insertBefore(childEl, parentEl.firstChild)
+const appendElement = (parentEl, childEl) => parentEl.appendChild(childEl)
+const render = (data, fn): ChildNode => document.createRange().createContextualFragment(fn(data)).firstChild
+const setBGUrl = (url, size = 'contain') => `
 	background: url(${url}) no-repeat;
 	background-size: ${size} !important
-`,
-getProp = (computedStyle, prop) => 
-	String(computedStyle.getPropertyValue(prop)).trim(),
-setProp = (el, prop, val) => el.style.setProperty(prop, val),
-setProps = (el, obj) => {
+`
+const getProp = (computedStyle, prop): string => String(computedStyle.getPropertyValue(prop)).trim()
+const setProp = (el, prop, val) => el.style.setProperty(prop, val)
+const setProps = (el, obj) => {
 	for (const prop in obj) {
 		const val = obj[prop]
 		el.style.setProperty(prop, val)
 	}
 	return el
-},
+}
 
-isInView = (el, visible = '') => {
+const isInView = (el, visible = ''): boolean => {
 	const 
 		{ top, bottom } = el.getBoundingClientRect(),
 		{ innerHeight: height } = window
@@ -84,9 +69,9 @@ isInView = (el, visible = '') => {
 	return visible === 'partial' ? 
 		top < height && (bottom >= 0) :
 		top >= 0 && (bottom <= height)
-},
+}
 
-paint = () => {
+const paint = () => {
 	const elems = tags(document, 'course')
 	for (const el of elems) {
 		const check = setInterval(() => {
@@ -110,9 +95,9 @@ paint = () => {
 			}
 		}, 50)
 	}
-},
+}
 			
-conceive = (data) => {
+const conceive = (data) => {
 	let courses = [], badges = []
 	const { badges: badgeCollection } = data
 	const welcome = id('welcome')
@@ -201,25 +186,22 @@ conceive = (data) => {
 	
 	// animate
 	paint()
-},
+}
 
-			
-// https://davidwalsh.name/promises
-request = (url, fn) => {
+const request = (url, fn) => {
 	let num: any = 100 // percent difference
-	const
-		loader = id('loader'),
-		computedStyle = getComputedStyle(loader),
-		req = new XMLHttpRequest(),
-		progress = () => {
+	const loader = id('loader')
+	const computedStyle = getComputedStyle(loader)
+	const req = new XMLHttpRequest()
+	const progress = () => {
 			const computedValue = getProp(computedStyle, '--progress')
-			num *= computedValue < '50' ? .9 : .6
+			num *= +computedValue < 50 ? .9 : .6
 			setProps(loader, {
 				['--progress']: num,
 				['--percent']: `'${100-num.toFixed(0)}'`
 			})
-		},
-		loading = setInterval(progress, 300)
+		}
+	const loading = setInterval(progress, 300)
 	
 	req.open("GET", url, true)
 	req.onload = () => {
@@ -234,5 +216,5 @@ request = (url, fn) => {
 	}
 	req.send()
 } 
-// end const
+
 request('https://teamtreehouse.com/abrahamjuliot.json', conceive)
