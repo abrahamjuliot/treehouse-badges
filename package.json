@@ -1,0 +1,33 @@
+{
+  "name": "treehouse-badges",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "stylus": "stylus src/style.styl -o style.css",
+    "autoprefixer": "postcss style.css -u autoprefixer -d ./",
+    "cleancss": "cleancss -o ./style.min.css style.css",
+    "build:css": "npm run stylus && npm run autoprefixer && npm run cleancss",
+    "build:ts": "tsc --out app.js src/app.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abrahamjuliot/treehouse-badges.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abrahamjuliot/treehouse-badges/issues"
+  },
+  "homepage": "https://github.com/abrahamjuliot/treehouse-badges#readme",
+  "dependencies": {
+    "stylus": "^0.54.5",
+    "typescript": "^3.1.6"
+  },
+  "devDependencies": {
+    "autoprefixer": "^9.3.1",
+    "clean-css-cli": "^4.2.1",
+    "postcss-cli": "^6.0.1",
+    "uglify-js": "^3.4.9"
+  }
+}
